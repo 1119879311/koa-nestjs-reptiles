@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@bylive/ioc": "^1.0.0",
-    "@bylive/nestjs": "^1.0.1",
+    "@bylive/nestjs": "1.0.2",
     "@bylive/router": "^1.0.0",
     "axios": "^1.7.2",
     "cheerio": "^1.0.0-rc.12",
