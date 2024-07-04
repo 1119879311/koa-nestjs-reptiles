@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File Upload Example</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+    }
+    #uploadForm {
+        max-width: 400px;
+        margin: auto;
+    }
+    #uploadForm input[type="file"] {
+        margin-bottom: 10px;
+    }
+    #uploadForm button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    #uploadForm button:hover {
+        background-color: #45a049;
+    }
+</style>
+</head>
+<body>
+    <div id="uploadForm">
+        <h2>File Upload Example</h2>
+        <input type="file" id="fileInput">
+        <button onclick="uploadFile()">Upload File</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                setStatus('Please select a file.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('name', file.name);
+            setStatus("")
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    setStatus(`Uploading... ${percentComplete.toFixed(1)}%`);
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    setStatus('File uploaded successfully!');
+                } else {
+                    setStatus(`Error uploading file: ${xhr.statusText}`);
+                }
+            };
+
+            xhr.onerror = function() {
+                setStatus('Error uploading file.');
+            };
+
+            xhr.send(formData);
+        }
+
+        function setStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+    </script>
+</body>
+</html>

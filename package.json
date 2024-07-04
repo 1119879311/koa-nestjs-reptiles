@@ -1,0 +1,40 @@
+{
+  "name": "test-koa-nestjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=production nodemon dist/index.js --ext js,mjs,json,env --watch dist --watch script --watch config",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src --watch script --watch config -e ts,tsx --exec npx ts-node ./src/index.ts",
+    "watch": "cross-env NODE_ENV=local npx tsc src --watch",
+    "build": "npx tsc src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bylive/ioc": "^1.0.0",
+    "@bylive/nestjs": "^1.0.1",
+    "@bylive/router": "^1.0.0",
+    "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12",
+    "cookies": "^0.8.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "koa-art-template": "^1.1.1",
+    "koa-body": "^6.0.1",
+    "koa-static": "^5.0.0",
+    "koa2-cors": "^2.0.6",
+    "nodemon": "^2.0.20",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "@types/cookies": "^0.7.7",
+    "@types/koa": "^2.13.6",
+    "@types/koa-router": "^7.4.4",
+    "@types/koa2-cors": "^2.0.5",
+    "@types/node": "^18.16.2",
+    "typescript": "^5.0.4"
+  }
+}
