@@ -2,14 +2,13 @@
 require("../script/loadEnv")({rootDir:"config"})
 import { KoaNestTs, Logger } from '@bylive/nestjs';
 import { appModule } from './app.module';
-import { setStateMiddleware } from './share/middlewares';
+import { setStateMiddleware ,koaMount} from './share/middlewares';
 import { authGuards } from './share/guards';
 import { ValidationPip } from './share/pipes';
 import koa2Cors from "koa2-cors";
 import  koaArtTemplate from "koa-art-template"
 import koaBody from "koa-body"
 import koaStatic from "koa-static"
-import {koaMount} from "./middleware/koa-mount"
 import { resolveRoot,getnetworkIp, mkResolveRoot } from './util';
 
 const PROT = Number(process.env.APP_PORT);
