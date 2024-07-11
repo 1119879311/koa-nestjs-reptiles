@@ -45,8 +45,8 @@ function start() {
       json: true, // 支持 JSON 格式的请求体
       text: true // 支持文本格式的请求体
     }),
-    // koaStatic(mkResolveRoot("public"))
-    koaMount("/public",koaStatic(mkResolveRoot("public")) ) ,
+    koaStatic(mkResolveRoot("public"))
+    // koaMount("/public",koaStatic(mkResolveRoot("public")) ) ,
 
   ); //全局中间件
   app.listen(PROT, () => {

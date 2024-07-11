@@ -1,0 +1,1 @@
+import{d as e,o as s,a as o,c as a,_ as t}from"./index-QN0rYQJi.js";const c={class:"page-user"},n=e({__name:"user",setup(r){return s(()=>{console.log("初始化user")}),(_,p)=>(o(),a("div",c,"user"))}}),d=t(n,[["__scopeId","data-v-8ca6278f"]]);export{d as default};

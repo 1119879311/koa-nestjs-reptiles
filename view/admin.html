@@ -1,0 +1,50 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="./favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vite App</title>
+    <script type="module" crossorigin src="./assets/index-o29vhlvn.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DkaQAHBd.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    {{if css}} 
+        {{each css}}
+            <link rel="stylesheet" crossorigin href="{{$value}}">
+        {{/each}}
+    {{/if}}
+</head>
+<body>
+    <div id="root"></div>
+    <div id="app"></div>
+
+    {{if js}}
+    <script>
+      {{each js}}
+          {{if typeof $value=="string"}}
+            <script type="module" crossorigin src="{{$value}}"></script>
+          {{/if}}
+          {{if typeof $value=="object"}}
+            const scriptElement = document.createElement('script');
+            {{each $value}}
+              scriptElement.setAttribute('{{$index }}', '{{ $value }}');
+            {{/each}}
+            document.body.appendChild(scriptElement);
+          {{/if}}
+      {{/each}}
+      </script>
+  {{/if}}
+</body>
+</html>

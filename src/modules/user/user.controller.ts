@@ -59,7 +59,7 @@ class db {
 @setMetadata('apiName', '这是元数据class')
 @Use(ClassMiddleware)
 @Guard(ClassGuard)
-@Controller('user')
+@Controller('/api/user')
 export class UserController extends db {
   a: number;
   constructor(private usererver: UserServer) {

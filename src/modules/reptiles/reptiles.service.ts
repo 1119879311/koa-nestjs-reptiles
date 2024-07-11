@@ -30,6 +30,8 @@ export class MuscieServer {
 
   private songList:any[] = []
 
+  private retryCount:number =20 // 重错次数
+
   constructor() {
     this.asyncPriorityQueue = new AsyncPriorityQueue(20,500);
     this.downMusicQueue = new AsyncPriorityQueue(20)
@@ -72,6 +74,9 @@ export class MuscieServer {
         Logger.error(JSON.stringify(response))
         return
       }
+      if(response.title){
+        response.title = sanitizeFileName(response.title || '') || ""
+      }
       reslist.push(response);
       Logger.info(response.url)
       this.downMusicQueue.addTask(()=>this.downloadFile(response));// 开启队列下载
@@ -90,11 +95,7 @@ export class MuscieServer {
     return new Promise(resolve=>{
         this.asyncPriorityQueue.onTaskFinsh(()=>{
             console.log("全部下载成功")
-            writeJsonToFile(reslist,
-              mkResolveRoot( "public","theme",'songe',`${keywork}.json`)
-              
-              // resolveRoot(path.join("public","theme",'songe', `${keywork}.json`))
-            )
+            writeJsonToFile(reslist, mkResolveRoot("public","theme",'songe',`${keywork}.json`))
             resolve(reslist)
         })
 
@@ -104,11 +105,10 @@ export class MuscieServer {
   }
 
 
-  // 下载
+  // 下载音频的
   private downloadFile(response){
     downloadFile(response.url,
-       mkResolveRoot("public","upload",'music',`${sanitizeFileName(response.title)}_${response.wmid}.${getUrlExtension(response.url)}`)
-      // resolveRoot(path.join("public","upload",'music', `${sanitizeFileName(response.title)}_${response.wmid}.${getUrlExtension(response.url)}`))
+       mkResolveRoot("public","upload",'music',`${(response.title)}_${response.wmid}.${getUrlExtension(response.url)}`)
     ).then(res=>{
       console.log(`资源下载成功,还剩下${this.downMusicQueue.getQueueSize()}个任务,【${response.url}】`)
       this.downRetryMap.delete(response.wmid)
@@ -116,9 +116,9 @@ export class MuscieServer {
     }).catch(err=>{
      
       let rescont = this.downRetryMap.get(response.wmid) || 0
-      if(rescont>10){
+      if(rescont>this.retryCount){
           Logger.error(err)
-          Logger.error("下载失败，重试次数已达10次:"+response.url)
+          Logger.error( `下载失败，重试次数已达${this.retryCount}次:${response.url}` )
           
       }else{
         this.downRetryMap.set(response.wmid,rescont+1)
@@ -130,6 +130,12 @@ export class MuscieServer {
     })
   }
 
+  /**
+   * 处理列表数据
+   * @param keywork 
+   * @param page 
+   * @returns 
+   */
   private async handleResponeData(keywork:string,page:number=1){
 
     let resData = await this.getFetchSongListData(keywork,page)
