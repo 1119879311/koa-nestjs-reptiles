@@ -5,5 +5,8 @@ import { UploadModule } from './modules/upload/upload.module';
 import { AdminModule } from './modules/admin/admin.module';
 @Module({
   imports: [UserModule,ReptilesModule,UploadModule,AdminModule],
+  providers:[
+    
+  ]
 })
 export class appModule {}
