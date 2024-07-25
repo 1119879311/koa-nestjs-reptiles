@@ -13,7 +13,6 @@ import { resolveRoot,getnetworkIp, mkResolveRoot } from './util';
 
 const PROT = Number(process.env.APP_PORT);
 const networkIps = getnetworkIp()
-
 Logger.setting({
   error:{ write:true}
 })

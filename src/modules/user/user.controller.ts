@@ -14,6 +14,7 @@ import {
 import Koa from 'koa';
 import { UserServer } from './user.serves';
 import * as Cookies from 'cookies';
+import { customCache } from '../../share/cacheManager';
 
 class useDto {
   id: string = '12';
@@ -80,14 +81,17 @@ export class UserController extends db {
     return this.usererver.find() + this.getd();
   }
   @GET('setCookies')
-  setCookies(@Cookie() cookie: Cookies, @Ctx() ctx: Koa.DefaultContext) {
-    console.log('ctx.state.useConfig', ctx.state.useConfig);
-    cookie.set('userInfo', JSON.stringify(ctx.state.useConfig));
-    return '设置cokie';
+  setCookies(@Cookie() cookie: Cookies, @Query() user:any) {
+    console.log('ctx.state.useConfig', user,{ttl:30});
+    cookie.set('userInfo', JSON.stringify(user));
+    customCache.set("userinfo",(user))
+    return user;
   }
   @GET('getCookies')
-  getCookies(@Cookie() cookie: Cookies) {
-    return cookie.get('userInfo') || {};
+  async getCookies(@Cookie() cookie: Cookies) {
+    let result  = await customCache.get("userinfo")
+    console.log("缓存",result)
+    return {cache:result,cookie: cookie.get('userInfo') || {}}
   }
   @GET()
   list(@Ctx() ctx: any) {
