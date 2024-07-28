@@ -14,7 +14,7 @@ export function createFacroy<T>(c: { new (...args: any[]): T }): (...args: any[]
 }
 
 
-export const getnetworkIp = ()=>{
+const getnetworkIp = ()=>{
 
   // 获取网络接口列表
   const networkInterfaces = os.networkInterfaces();
@@ -34,6 +34,7 @@ export const getnetworkIp = ()=>{
     return addressList
 }
 
+export const networkIps = getnetworkIp()
 
 export const getUrlExtension = (urlString) => {
   let pathName  =  url.parse(urlString).pathname
@@ -85,6 +86,7 @@ export function replaceSlashAndBackslash(str:string) {
 export function sanitizeFileName(fileName:string,replaceStr="") {
   return fileName.replace(/[\\/:*?"<>|]/g, replaceStr).replace(/\s/g, '');
 }
+
 
 // 设置环境变量
 export const appRoot = fs.realpathSync(process.cwd()); //
