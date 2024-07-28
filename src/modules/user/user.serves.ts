@@ -1,10 +1,14 @@
 import { Injectable } from '@bylive/ioc';
-import { SqlServer } from './usersql.server';
+
+import { tk_user } from '../../entity/tk_user.entity';
+import { AppDataSource } from '../../typeorm';
 
 @Injectable()
 export class UserServer {
-  constructor(private sqlServer: SqlServer) {}
-  find(optoin: Record<string, any> = {}) {
-    return this.sqlServer.find();
+  constructor() { }
+  async find() {
+    const userRepository =await AppDataSource.getRepository(tk_user);
+    const users = await userRepository.find({ relations: ['roles'] });
+    return users
   }
 }

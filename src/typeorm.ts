@@ -33,7 +33,7 @@ function loadEntity(
   }
 }
 
-const AppDataSource = new DataSource({
+export const AppDataSource = new DataSource({
   name: "default",
   type: "mysql",
   host: "localhost",
@@ -49,6 +49,9 @@ const AppDataSource = new DataSource({
   maxQueryExecutionTime: 1000,
   logging: ["error"],
 });
+
+
+
 
 export default () => {
   return AppDataSource.initialize()

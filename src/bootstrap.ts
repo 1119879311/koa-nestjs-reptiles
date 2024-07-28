@@ -12,11 +12,11 @@ import { AppConfig } from './config';
 
 export function bootstrap() {
   const app = KoaNestTs.create(appModule);
-  const koaInastance = app.getKoa()
+  const koaInstance= app.getKoa()
   app.use(setStateMiddleware);
   app.setGlobalGuard(authGuards);
   app.setGlobalPip(new ValidationPip());
-  koaArtTemplate(koaInastance, {
+  koaArtTemplate(koaInstance, {
     root: resolveRoot("view"),
     extname: '.html',
     debug: process.env.NODE_ENV !== 'production'

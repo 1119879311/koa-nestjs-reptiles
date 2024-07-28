@@ -11,9 +11,9 @@ async function start(){
     await db()
     await bootstrap()
   } catch (error) {  
+    Logger.error(error)
   }
 }
-
 start()
 
 
