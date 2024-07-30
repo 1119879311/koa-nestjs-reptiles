@@ -9,7 +9,8 @@ import koaBody from "koa-body"
 import koaStatic from "koa-static"
 import { resolveRoot,networkIps, mkResolveRoot } from './util';
 import { AppConfig } from './config';
-
+import { getTokenSign, getUid } from './util/aes';
+Logger.info(getTokenSign("admin"))
 export function bootstrap() {
   const app = KoaNestTs.create(appModule);
   const koaInstance= app.getKoa()
@@ -44,9 +45,9 @@ export function bootstrap() {
   ); //全局中间件
   app.listen(AppConfig.APP_PORT, () => {
     
-    Logger.info(`[APPSERVICE] app is successful: http://127.0.0.1:${AppConfig.APP_PORT}/`);
+    Logger.info(`[AppService] app is successful: http://127.0.0.1:${AppConfig.APP_PORT}/`);
     networkIps.forEach(ip=>{
-      Logger.info(`[APPSERVICE] app is successful: http://${ip}:${AppConfig.APP_PORT}/`);
+      Logger.info(`[AppService] app is successful: http://${ip}:${AppConfig.APP_PORT}/`);
     })
   });
 }

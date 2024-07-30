@@ -15,7 +15,7 @@ import {
   Cookie,
 } from "@bylive/router";
 
-@Controller("admin")
+@Controller("adminConsole")
 export class AdminController {
 
   

@@ -18,7 +18,6 @@ import {
 import { UploadServer } from "./upload.service";
 import { mkResolveRoot,  } from '../../util';
 import fs from 'fs'
-import { Inject } from "@bylive/ioc";
 
 
 @Controller("upload")
