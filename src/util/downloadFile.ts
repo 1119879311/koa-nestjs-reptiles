@@ -3,22 +3,40 @@ import {getRequestHeaders} from "./requestHeaders"
 import fs from 'fs'
 
 export const downloadFile = async (url:string, outputPath:string,option:AxiosRequestConfig={}) => {
-  const response = await axios({
-    method: 'GET',
-    url: url,
-    responseType: 'stream',
-    headers:{
-        ...getRequestHeaders()
-    },
-    ...option
-  });
-
-  const writer = fs.createWriteStream(outputPath);
-
-  response.data.pipe(writer);
-
-  return new Promise((resolve, reject) => {
-    writer.on('finish', resolve);
-    writer.on('error', reject);
-  });
+  try {
+    const {headers={},...config} = option || {};
+    const response = await axios({
+      method: 'GET',
+      url: url,
+      responseType: 'stream',
+      headers:{
+          ...getRequestHeaders(),
+          ...headers
+      },
+      ...config
+    });
+    return  writerStearm(response.data,outputPath)
+  } catch (error) {
+    return Promise.reject(error)
+  }
 };
+
+export const writerStearm = (data,outputPath)=>{
+    return new Promise((resolve,reject)=>{
+      try {
+        const writer = fs.createWriteStream(outputPath);
+        data.pipe(writer);
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+      } catch (error) {
+        reject(error)
+      }
+    })
+
+}
+
+
+
+
+
+

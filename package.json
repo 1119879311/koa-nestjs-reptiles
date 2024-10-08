@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "cross-env NODE_ENV=production nodemon dist/index.js --ext js,mjs,json,env --watch dist --watch script --watch config",
     "dev": "cross-env NODE_ENV=development nodemon --watch src --watch script --watch config -e ts,tsx --exec npx ts-node ./src/index.ts",
+    "serve": "cross-env NODE_ENV=development nodemon --watch src --watch script --watch config -e ts,tsx --exec npx ts-node ./src/micro_services/index.ts",
     "watch": "cross-env NODE_ENV=local npx tsc src --watch",
     "build": "npx tsc src"
   },
@@ -19,6 +20,7 @@
     "@bylive/router": "^1.1.0",
     "@types/cache-manager": "^4.0.6",
     "@types/cache-manager-redis-store": "^2.0.4",
+    "argon2": "^0.41.1",
     "axios": "^1.7.2",
     "cache-manager": "^5.7.3",
     "cache-manager-redis-store": "^3.0.1",

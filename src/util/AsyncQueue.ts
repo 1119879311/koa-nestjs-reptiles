@@ -5,7 +5,7 @@ class AsyncTask {
   isAborted: boolean;
   isRunning: boolean;
   constructor(id, priority, taskFunction) {
-    this.id = id || "taskId-" + Math.random();
+    this.id = id || "TASK_" + Math.random().toString().replace("0.",'');
     this.priority = priority;
     this.taskFunction = taskFunction;
     this.isAborted = false;
@@ -47,6 +47,8 @@ class AsyncTask {
   }
 }
 
+type ItaskRunCallbak = (option:{success:boolean,id:string|number,priority: string|number | undefined |null, data:any})=>void |null
+
 export class AsyncPriorityQueue {
   concurrency: any;
   interval: any;
@@ -56,9 +58,10 @@ export class AsyncPriorityQueue {
   intervalTimer: any;
   bufferTimer: any;
   lastTaskTime: number;
-  successCallback: any;
-  errorCallback: any;
-  finshCallback:any
+  // successCallback: any;
+  // errorCallback: any;
+  taskRunCallbak:ItaskRunCallbak
+  // finshCallback:any
   constructor(concurrency?, interval?, bufferTime?) {
     this.concurrency = concurrency || null; // 并发数量限制
     this.interval = interval || null;       // 任务之间的间隔时间
@@ -69,9 +72,10 @@ export class AsyncPriorityQueue {
     this.bufferTimer = null;                // 缓冲定时器
     this.lastTaskTime = Date.now();         // 最后一个任务加入的时间
 
-    this.successCallback = null;
-    this.errorCallback = null;
-    this.finshCallback = null
+    // this.successCallback = null;
+    // this.errorCallback = null;
+    this.taskRunCallbak = null
+    // this.finshCallback = null
 
   }
 
@@ -85,14 +89,15 @@ export class AsyncPriorityQueue {
     return task.id
   }
 
-  onTaskRun(successCallback?, errorCallback?) {
-    this.successCallback = successCallback;
-    this.errorCallback = errorCallback;
+  onTaskRun(taskRunCallbak:ItaskRunCallbak) {
+    this.taskRunCallbak = taskRunCallbak;
+    // this.successCallback = successCallback;
+    // this.errorCallback = errorCallback;
   }
 
-  onTaskFinsh(callback){
-    this.finshCallback = callback
-  }
+  // onTaskFinsh(callback){
+  //   this.finshCallback = callback
+  // }
 
   startBufferTimer() {
     if (this.bufferTimer) {
@@ -155,21 +160,22 @@ export class AsyncPriorityQueue {
     }
   }
 
-  private finshTask(){
-      if(this.isFinsh() && typeof this.finshCallback==="function"){
-          this.finshCallback()
-      }
+  // private finshTask(){
+  //     if(this.isFinsh() && typeof this.finshCallback==="function"){
+  //         this.finshCallback()
+  //     }
 
-  }
+  // }
   // 任务完成后的处理
   completeTask(nextTask,isSuccess,data) {
     this.runningTasks.delete(nextTask.id);
-    if(isSuccess){
-      this.successCallback?.({ id: nextTask.id, priority: nextTask.priority, data })
-    }else{
-      this.errorCallback?.({ id: nextTask.id, priority: nextTask.priority, error:data })
-    }
-    this.finshTask()
+    this.taskRunCallbak?.({success:isSuccess,id:nextTask.id,priority: nextTask.priority, data})
+    // if(isSuccess){
+    //   this.successCallback?.({ id: nextTask.id, priority: nextTask.priority, data })
+    // }else{
+    //   this.errorCallback?.({ id: nextTask.id, priority: nextTask.priority, error:data })
+    // }
+    // this.finshTask()
 
     // 如果还有任务在队列中，且没有正在执行的任务
     if (this.taskQueue.length > 0 && this.runningTasks.size === 0) {

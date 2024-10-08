@@ -1,6 +1,5 @@
 import { MuscieServer } from "./reptiles.service";
 import { Controller, GET, Query, Ctx } from "@bylive/router";
-
 @Controller("reptiles")
 export class ReptilesController {
   constructor(private muscieServer: MuscieServer) {}

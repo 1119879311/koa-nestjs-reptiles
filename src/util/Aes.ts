@@ -1,42 +1,9 @@
 
 // 加密解密
 import * as crypto from "crypto";
+import * as argon2 from "argon2"
 
-const AES_SECRET_KEY='AES_SECRET_KEY';
-
-
-const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-    modulusLength: 2048,
-  });
-  
-  /**
-   *  非对称加密
-   * @param text 
-   * @returns 
-   */
- export function encryptWithPublicKey(text) {
-    const encryptedBuffer = crypto.publicEncrypt(publicKey, Buffer.from(text));
-    return encryptedBuffer.toString('base64');
-  }
-  
-  /**
-   * 非对称解密
-   * @param encryptedText 
-   * @returns 
-   */
- export function decryptWithPrivateKey(encryptedText) {
-    const encryptedBuffer = Buffer.from(encryptedText, 'base64');
-    const decryptedBuffer = crypto.privateDecrypt(privateKey, encryptedBuffer);
-    return decryptedBuffer.toString();
-  }
-
-  const plaintext = 'Hello, World!';
-  const encryptedText = encryptWithPublicKey(plaintext);
-  const decryptedText = decryptWithPrivateKey(encryptedText);
-  
-  console.log('原数据：Plaintext:', plaintext);
-  console.log('加密:Encrypted Text:', encryptedText);
-  console.log('解密：Decrypted Text:', decryptedText);
+const AES_SECRET_KEY='cac639bd5a423901b984d2b1e1cfb8a9ec4bbf3a4edf2615849da0d42ab378db';
 
 // 生成时间戳
 export const getTimestamp = ()=>{
@@ -72,8 +39,9 @@ export const sha256= (str:string,encodeing:crypto.Encoding='utf-8')=>{
 }
 export const getTokenSign = (data:string)=>{
      const timestamp = getTimestamp();
-     const nonceStr  = getUid();
+     let nonceStr = crypto.randomBytes(64).toString("hex");
      let toStr = getQueryString({nonceStr,jsapi_ticket:AES_SECRET_KEY,timestamp,data})
+     console.log("toStr",toStr)
      return sha256(toStr)
 }
 
@@ -92,15 +60,6 @@ export function signRonder(n = 30){ //取随机数
         ronderstr += str[index];
     }
     return ronderstr
-}
-
-/**
- * md5 加密
- * @param str 
- * @param encodeing 
- */
-export const md5 = (str:string,encodeing:crypto.Encoding='utf-8')=>{
-    return crypto.createHash('md5').update(str, encodeing).digest('hex')
 }
 
 
@@ -122,18 +81,16 @@ export const Aes = {
      * 
      * @param dataKey 要生成加密key 的自定义datakey(解密的时候需要)
      */
-    encryption:function(data:string|number,dataKey:string|number){
+    encryption:function(data:string,dataKey:string|Buffer){
         try {
-            data = typeof data!=="string"?data.toString():data;
-            dataKey = typeof dataKey!=="string"?dataKey.toString():dataKey;
-            let algorithm = 'aes-256-ctr';
-            let key = crypto.scryptSync(dataKey, AES_SECRET_KEY, 32);
-            let iv = crypto.randomBytes(16);
+            const algorithm = 'aes-256-cbc';
+            const key = crypto.scryptSync(dataKey, AES_SECRET_KEY, 32);
+            const iv = crypto.randomBytes(16);
             const cipher = crypto.createCipheriv(algorithm,key,iv);
             let encrypted = cipher.update(data, 'utf8', 'hex');
             encrypted += cipher.final('hex');
-            let strIv = iv.toString("hex")
-            return encrypted+'.'+strIv;
+            const strIv = iv.toString("hex")
+            return encrypted+'::'+strIv;
         } catch (error) {
             return null;   
         }
@@ -144,12 +101,12 @@ export const Aes = {
      * @param afterData 加密后的数据
      * @param dataKey 要生成加密key 的自定义datakey(和加密的一样)
      */
-    decrypt:function(afterData:string,dataKey:string|number){
+    decrypt:function(afterData:string,dataKey:string){
         try {
-            dataKey = typeof dataKey!="string"?dataKey.toString():dataKey;
-            let algorithm = 'aes-256-ctr';
-            let [value,iv] = afterData.split('.');
-            let ivBuffer = Buffer.from(iv,'hex');
+            
+            const algorithm = 'aes-256-cbc';
+            const [value,iv] = afterData.split('::');
+            const ivBuffer = Buffer.from(iv,'hex');
             let key = crypto.scryptSync(dataKey, AES_SECRET_KEY, 32);
             const decipher = crypto.createDecipheriv(algorithm, key, ivBuffer);
             let decrypted = decipher.update(value, 'hex', 'utf8');
@@ -161,3 +118,88 @@ export const Aes = {
         }
     }
 }
+
+
+export async function hashPasswordWithSalt(password) {
+    try {
+      // 自定义盐值
+      const salt = crypto.randomBytes(32);
+     console.log("salt",salt.toString("hex"))    
+        return await argon2.hash(password, { salt });
+    } catch (err) {
+      console.error('Error hashing password:', err);
+    }
+  }
+
+  async function verifyPassword(hash, plainPassword) {
+    try {
+  
+      const match = await argon2.verify(hash, plainPassword);
+   
+      if (match) {
+        return true
+      }
+      return false
+    } catch (err) {
+      return false
+    }
+  }
+  
+
+  (async () => {
+    const password = 'mySecurePassword';
+    let res = await hashPasswordWithSalt(password);
+    console.log("Res",res)
+
+    const val = await verifyPassword("$argon2id$v=19$m=65536,t=3,p=4$IkCJqN/C/cJUC63XhgdqwzLDwAE65bhv7FO1Cf8B/2M$/KWPaU4rtK9LrCMv9jOzB8kNpfjbkz3tuJT+B/aEYvk",password)
+  
+  })();
+
+// const plaintext = 'Hello, World!';
+// const encryptedText = encryptWithPublicKey(plaintext);
+// const decryptedText = decryptWithPrivateKey("Tds95muJwshCdKvVArndPJoXrU5gTyL0pShK5tmEnLYKrmpK4AN7GlN3PZkHXD+wnPbvGmlBC9jRTvV88aJKN7zT4o9+hrxRUzD5DmAgPCykmU7v4UastQafS907Q7n4BRzIi++hPPz31zwk/USWqp2GxPQaLBqlqDeC2ZqpKLnLyihp48cQeKoClLHRh4o4OA+WMcd3us/lGGIoaj6uMVNh6FjvkYDyHbA/mu0cctrqUNCv6o7V2nlnnS65nXFA+GEvNi7pP7FwSyf5odNxTa5WelLtA2DsYbNeaoC4jTJPqhU1TufgDSheUwLCUe");
+
+// console.log('原数据：Plaintext:', plaintext);
+// console.log('加密:Encrypted Text:', encryptedText);
+// console.log('解密：Decrypted Text:', decryptedText);
+
+const plaintext1 = AES_SECRET_KEY//'1';
+const encryptedText1 = Aes.encryption(plaintext1,'key');
+const decryptedText1 = Aes.decrypt(encryptedText1,'key');
+console.log('原数据：Plaintext:', plaintext1);
+console.log('加密:Encrypted Text:', encryptedText1);
+console.log('解密：Decrypted Text:', decryptedText1);
+
+console.log("sha256",sha256("123456"))
+console.log("shaHmac",shaHmac("123456"))
+console.log("getTokenSign",shaHmac("getTokenSign"))
+console.log("getUid",getUid())
+
+// getUid
+
+
+
+// // 定义要哈希的密码
+// const password = 'mySuperSecretPassword';
+
+// // 生成随机盐
+// const salt = crypto.randomBytes(32).toString('hex');
+
+// // 使用 SHA-256 哈希密码并加上盐
+// const hash = crypto.createHmac('sha256', salt)
+//                    .update(password)
+//                    .digest('hex');
+
+// console.log('Salt:', salt);
+// console.log('Hashed password:', hash);
+
+// // 验证密码时，使用同样的盐进行哈希
+// function verifyPassword(inputPassword, storedHash, salt) {
+//     const hashToCompare = crypto.createHmac('sha256', salt)
+//                                 .update(inputPassword)
+//                                 .digest('hex');
+//     return hashToCompare === storedHash;
+// }
+
+// // 示例：验证密码
+// console.log('Password match:', verifyPassword('mySuperSecretPassword', hash, salt)); // true

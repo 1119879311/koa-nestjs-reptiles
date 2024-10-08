@@ -13,6 +13,11 @@ export function createFacroy<T>(c: { new (...args: any[]): T }): (...args: any[]
   };
 }
 
+export function encodeChineseInURL(url) {
+  return url.replace(/[\u4e00-\u9fa5]/g, function(match) {
+      return encodeURIComponent(match);
+  });
+}
 
 const getnetworkIp = ()=>{
 
@@ -45,6 +50,13 @@ export const getUrlExtension = (urlString) => {
     return '';
   }
 };
+
+
+export const dalay = (awit=0)=>{
+  return new Promise(resolve=>{
+     setTimeout(resolve,awit)
+  })
+}
 
 
 export function writeJsonToFile(jsonData, filePath) {

@@ -12,16 +12,15 @@ import cheerio from "cheerio"; // 这是一个在node端的jquery
 import url from "url";
 import { Logger } from "@bylive/nestjs";
 import path from "path";
-import { Injectable } from "@bylive/ioc";
 
 // 爬音乐的
-@Injectable()
+
 export class MuscieServer {
   private asyncPriorityQueue: AsyncPriorityQueue;
   private downMusicQueue: AsyncPriorityQueue;
   private downRetryMap: Map<string, number>;
-  private HOST:string = "www.wxmp3.com"
-  private hostUrl: string = encodeChineseInURL("http://www.wxmp3.com/");
+  private HOST:string = "music.2t58.com"
+  private hostUrl: string = encodeChineseInURL("http://music.2t58.com");
   private songTotal: number = 0;
 
   private songList: any[] = [];
@@ -226,7 +225,7 @@ export class MuscieServer {
   }
 
   private async getFetchSongListData(keywork: string, page: number = 1) {
-    const url = encodeChineseInURL(`${this.hostUrl}so/song/${keywork}/${page}.html`)
+    const url = encodeChineseInURL(`${this.hostUrl}/so/${keywork}/${page}.html`)
     try {
 
       return await axios.get(url, {
@@ -248,10 +247,10 @@ export class MuscieServer {
     }
   }
 
-  private async getSongInfo(id: string, type: string = "mp3") {
+  private async getSongInfo(id: string, type: string = "song") {
     const reqParams = {url:encodeChineseInURL("http://www.wxmp3.com/style/js/play.php"),id,type};
     return axios
-      .post(reqParams.url, `id=${reqParams.id}&type=dance`, {
+      .post(reqParams.url, `id=${reqParams.id}&type=music`, {
         headers: {
           ...getRequestHeaders(),
           "Accept": "application/json, text/javascript, */*; q=0.01",
